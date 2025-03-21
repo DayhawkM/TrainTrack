@@ -20,15 +20,14 @@ Session(app)
 
 # Restore Talisman
 csp = {
-    'default-src': ["'self'"],  # Blocks external scripts
-    'script-src': ["'self'"],  # Blocks inline scripts and eval()
-    'style-src': ["'self'", "'unsafe-inline'"],  # Allows only inline styles
-    'img-src': ["'self'", "data:"],  # Allows local images and data URIs
-    'frame-ancestors': ["'none'"],  # Blocks embedding in iframes
-    'object-src': ["'none'"],  # Blocks Flash and other plugins
+    'default-src': ["'self'"],
+    'script-src': ["'self'"],  # Block inline scripts
+    'style-src': ["'self'", "'unsafe-inline'"],
+    'font-src': ["'self'"],
+    'img-src': ["'self'", "data:"]
 }
 
-Talisman(app, content_security_policy=csp, content_security_policy_nonce_in=['script-src'])
+Talisman(app, content_security_policy=csp)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
