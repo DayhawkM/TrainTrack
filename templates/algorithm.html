@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout Plan Generator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom right, #f4f4f9, #d6e4f0);
+            color: #333;
+        }
+
+        nav {
+            background-color: #222;
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 20px;
+            font-size: 18px;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        nav a:hover {
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 80px;
+            font-size: 3rem;
+            color: #444;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .container div {
+            margin-bottom: 20px;
+        }
+
+        .container div label {
+            font-size: 1.1rem;
+            color: #444;
+        }
+
+        .container div select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            font-size: 1rem;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        .container div input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .container div input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        footer {
+            background-color: #222;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 40px;
+            font-size: 14px;
+        }
+
+        footer a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="/">Home</a> 
+        <a href="/about">About Me</a>
+        <a href="/algorithm">Design Your Workout</a>
+        <a href="/my_plans">My Plans</a>
+        <a href="/past_workouts">Past Workouts</a>
+        {% if 'user_id' in session %}
+        <a href="/logout">Logout</a>
+        {% else %}
+        <a href="/login">Login</a>
+        <a href="/register">Register</a>
+        {% endif %}
+    </nav>
+    <h1>Generate Your Workout Plan</h1>
+
+    <div class="container">
+        <form method="POST">
+            {{ form.hidden_tag() }}
+
+            <div>
+                <label for="goals">{{ form.goals.label }}</label>
+                {{ form.goals(id="goals", value="", placeholder="Select a Goal") }}
+            </div>
+
+            <div>
+                <label for="experience_level">{{ form.experience_level.label }}</label>
+                {{ form.experience_level(id="experience_level", value="", placeholder="Select Experience Level") }}
+            </div>
+
+            <div>
+                {{ form.submit() }}
+            </div>
+        </form>
+    </div>
+
+    <footer>
+        &copy; 2024 Mo's Fitness Page. All Rights Reserved. | <a href="/privacy">Privacy Policy</a>
+    </footer>
+</body>
+
+</html>

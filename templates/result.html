@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Workout Plan</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f4f4f9;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        form {
+            text-align: center;
+            margin-top: 20px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .cardio {
+            font-style: italic;
+            color: #d9534f;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/about">About Me</a>
+        <a href="/algorithm">Design Your Workout</a>
+        <a href="/my_plans">My Plans</a>
+        <a href="/past_workouts">Past Workouts</a>
+        {% if 'user_id' in session %}
+        <a href="/logout">Logout</a>
+        {% else %}
+        <a href="/login">Login</a>
+        <a href="/register">Register</a>
+        {% endif %}
+    </nav>
+
+    <h1>Your {{ days }}-Day Workout Plan</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Day</th>
+                <th>Exercises</th>
+            </tr>
+        </thead>
+        <tbody> 
+            {% for day, data in workout_days.items() %}
+                <tr>
+                    <td>{{ day }}</td>
+                    <td>
+                        <ul style="list-style-type: none; padding: 0;">
+                            {% for exercise in data.exercises %}
+                                <li>{{ exercise }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% if data.cardio %}
+                            <p class="cardio">Cardio: {{ data.cardio }}</p>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <form action="/save_plan" method="POST">
+        <button type="submit">Save This Plan</button>
+    </form>
+</body>
+</html>

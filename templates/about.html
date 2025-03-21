@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Me</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom right, #f4f4f9, #d6e4f0);
+            color: #333;
+        }
+
+        nav {
+            background-color: #222;
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 20px;
+            font-size: 18px;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        nav a:hover {
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+        }
+
+        h1 {
+            text-align: left;
+            font-size: 3rem;
+            color: #444;
+            opacity: 0;
+            animation: fadeIn 1s forwards 0.5s;
+            margin-left: 20px;
+        }
+
+        h1 span {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        /* Flexbox container for the image and text side by side */
+        .about-container {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin: 20px auto;
+            padding: 20px;
+            max-width: 1200px;
+        }
+
+        /* Image sliding from left */
+        .hero-image {
+            width: 40%;  /* Slightly smaller to fit side by side */
+            height: auto;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-top: 20px;
+            animation: slideInLeft 1s forwards;
+        }
+
+        /* Slide-in effect for the image */
+        @keyframes slideInLeft {
+            from {
+                transform: translateX(-100%);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        /* Slide-up effect for text */
+        .container {
+            max-width: 60%;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            animation: slideUp 1s forwards 1s;
+        }
+
+        /* Slide-up effect for text */
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .container p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        footer {
+            background-color: #222;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 40px;
+            font-size: 14px;
+        }
+
+        footer a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="/">Home</a> <!-- Added the link to the homepage -->
+        <a href="/about">About Me</a>
+        <a href="/algorithm">Design Your Workout</a>
+        <a href="/my_plans">My Plans</a>
+        <a href="/past_workouts">Past Workouts</a>
+        {% if 'user_id' in session %}
+        <a href="/logout">Logout</a>
+        {% else %}
+        <a href="/login">Login</a>
+        <a href="/register">Register</a>
+        {% endif %}
+    </nav>
+
+    <h1>About <span>Mo</span></h1>
+
+    <div class="about-container">
+        
+        <img src="{{ url_for('static', filename='images/hero2.jpg') }}" alt="Fitness Image" class="hero-image">
+
+        <div class="container">
+            <p>Hi, I'm Mo! I'm a computer science student with a passion for both coding and fitness. I created this platform to merge my love for technology with my dedication to staying healthy and active.</p>
+            <p>As part of my studies, I designed a Flask-based algorithm to generate personalized workout plans for users. The goal is to help others build effective routines based on their age, experience level, and fitness goals, so they can achieve their best selves!</p>
+            <p>Whether you're just starting your fitness journey or you're a seasoned athlete, I hope this platform inspires you to stay consistent, push your limits, and prioritize your health. Let's get stronger together!</p>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2024 Mo's Fitness Page. All Rights Reserved. | <a href="/privacy">Privacy Policy</a>
+    </footer>
+</body>
+
+</html>
