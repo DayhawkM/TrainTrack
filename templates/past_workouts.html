@@ -1,175 +1,49 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Past Workouts - Mo's Fitness Page</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(to bottom right, #f4f4f9, #d6e4f0);
-            color: #333;
-        }
+{% block title %}Past Workouts - Mo's Fitness Page{% endblock %}
 
-        nav {
-            background-color: #222;
-            color: white;
-            padding: 15px 0;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            text-align: center;
-        }
+{% block content %}
+<h1>Past Workouts</h1>
 
-        nav a {
-            color: white;
-            text-decoration: none;
-            margin: 0 15px;
-            font-size: 18px;
-            padding: 8px 15px;
-            border-radius: 5px;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
+<div class="container">
+    {% for workout in past_workouts %}
+    <div class="plan">
+        <h3>Workout Date: {{ workout.timestamp.strftime('%Y-%m-%d') }}</h3>
+        <p><strong>Plan ID:</strong> {{ workout.plan_id }}</p>
 
-        nav a:hover {
-            background-color: #4CAF50;
-            color: white;
-        }
+        {% for day, details in workout.workout_data.items() %}
+            <h4>Day: {{ day }}</h4>
 
-        h1 {
-            text-align: center;
-            font-size: 3rem;
-            color: #444;
-            margin-top: 20px;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 30px auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .plan {
-            background: #eef;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 10px;
-        }
-
-        h3 {
-            color: #4CAF50;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-
-        table, th, td {
-            border: 1px solid #ccc;
-        }
-
-        th, td {
-            padding: 10px;
-            text-align: center;
-        }
-
-        th {
-            background: #4CAF50;
-            color: white;
-        }
-
-        footer {
-            background-color: #222;
-            color: white;
-            text-align: center;
-            padding: 20px 0;
-            margin-top: 40px;
-            font-size: 14px;
-        }
-
-        footer a {
-            color: #4CAF50;
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-    </style>
-</head>
-
-<body>
-    <nav>
-        <a href="/">Home</a>
-        <a href="/about">About Me</a>
-        <a href="/algorithm">Design Your Workout</a>
-        <a href="/my_plans">My Plans</a>
-        <a href="/past_workouts">Past Workouts</a>
-        {% if 'user_id' in session %}
-        <a href="/logout">Logout</a>
-        {% else %}
-        <a href="/login">Login</a>
-        <a href="/register">Register</a>
-        {% endif %}
-    </nav>
-
-    <h1>Past Workouts</h1>
-
-    <div class="container">
-        {% for workout in past_workouts %}
-        <div class="plan">
-            <h3>Workout Date: {{ workout.timestamp.strftime('%Y-%m-%d') }}</h3>
-            <p><strong>Plan ID:</strong> {{ workout.plan_id }}</p>
-    
-            {% for day, details in workout.workout_data.items() %}
-                <h4>Day: {{ day }}</h4>
-    
-                {% if "exercises" in details and details.exercises %}
-                <table>
+            {% if "exercises" in details and details.exercises %}
+            <table>
+                <tr>
+                    <th>Exercise</th>
+                    <th>Reps</th>
+                    <th>Weight (kg)</th>
+                </tr>
+                {% for exercise, exercise_data in details.exercises.items() %}
                     <tr>
-                        <th>Exercise</th>
-                        <th>Reps</th>
-                        <th>Weight (kg)</th>
+                        <td>{{ exercise }}</td>
+                        <td>{{ exercise_data.reps }}</td>
+                        <td>{{ exercise_data.weight }}</td>
                     </tr>
-                    {% for exercise, exercise_data in details.exercises.items() %}
-                        <tr>
-                            <td>{{ exercise }}</td>
-                            <td>{{ exercise_data.reps }}</td>
-                            <td>{{ exercise_data.weight }}</td>
-                        </tr>
-                    {% endfor %}
-                </table>
-                {% else %}
-                    <p>No strength exercises recorded for this day.</p>
-                {% endif %}
-    
-                {% if "cardio" in details %}
-                    <p class="cardio"><strong>Cardio:</strong> {{ details.cardio.time }} minutes</p>
-                {% endif %}
-            {% endfor %}
-        </div>
+                {% endfor %}
+            </table>
+            {% else %}
+                <p>No strength exercises recorded for this day.</p>
+            {% endif %}
+
+            {% if "cardio" in details %}
+                <p class="cardio"><strong>Cardio:</strong> {{ details.cardio.time }} minutes</p>
+            {% endif %}
+        {% endfor %}
+    </div>
     {% else %}
         <p>No past workouts recorded yet.</p>
     {% endfor %}
-    
-    </div>
-    <form action="/clear_past_workouts" method="POST" style="text-align: center;">
-        <button type="submit" style="padding: 10px 20px; background-color: red; color: white; border: none; border-radius: 5px;">
-            Clear Past Workouts
-        </button>
-    </form>
-    <footer>
-        &copy; 2024 Mo's Fitness Page. All Rights Reserved. | <a href="/privacy">Privacy Policy</a>
-    </footer>
-</body>
+</div>
 
-</html>
+<form action="/clear_past_workouts" method="POST" style="text-align: center;">
+    <button type="submit" class="clear-btn">Clear Past Workouts</button>
+</form>
+{% endblock %}

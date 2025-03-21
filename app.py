@@ -1,34 +1,41 @@
+import os
 from flask import Flask, request, render_template, redirect, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms import LoginForm, AlgorithmForm, RegistrationForm
+from flask_session import Session 
 import json
 from datetime import datetime
 from flask_talisman import Talisman
-
-#pip install flask flask-sqlalchemy flask-migrate flask-wtf wtforms werkzeug email_validator flask_talisman gunicorng
-#install extension "SQLite Viewer" for better database readability
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///traintrack.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SESSION_TYPE'] = 'filesystem'
+Session(app)
 
+
+
+# Restore Talisman
 csp = {
-    'default-src': ["'self'"],
-    'style-src': ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-    'font-src': ["'self'", "https://fonts.gstatic.com"],
-    'img-src': ["'self'", "data:"]
+    'default-src': ["'self'"],  # Blocks external scripts
+    'script-src': ["'self'"],  # Blocks inline scripts and eval()
+    'style-src': ["'self'", "'unsafe-inline'"],  # Allows only inline styles
+    'img-src': ["'self'", "data:"],  # Allows local images and data URIs
+    'frame-ancestors': ["'none'"],  # Blocks embedding in iframes
+    'object-src': ["'none'"],  # Blocks Flash and other plugins
 }
 
-Talisman(app, content_security_policy=csp)
+Talisman(app, content_security_policy=csp, content_security_policy_nonce_in=['script-src'])
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)  
     name = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
@@ -80,7 +87,6 @@ def load_workouts():
 def assign_workout(goals, experience_level):
     workout_data = load_workouts()
     
- 
     plan = workout_data.get(goals, {}).get(experience_level, {})
 
     if "workouts" in plan:
@@ -114,7 +120,6 @@ def algorithm():
     return render_template('algorithm.html', form=form)
 
 
-
 @app.route('/save_plan', methods=['POST'])
 def save_plan():
     if 'user_id' not in session:
@@ -124,7 +129,6 @@ def save_plan():
     workout_days = session.get('workout_days')
     goals = session.get('goals')
     experience_level = session.get('experience_level')
-
 
     workout_json = json.dumps(workout_days) 
 
@@ -138,14 +142,19 @@ def save_plan():
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
+        username = form.username.data
         name = form.name.data
         email = form.email.data
         password = form.password.data
 
+        # Check if username or email already exists
+        if User.query.filter_by(username=username).first():
+            return "Username already exists!"
         if User.query.filter_by(email=email).first():
-            return "User already exists!"
+            return "Email already exists!"
 
-        new_user = User(name=name, email=email)
+        # Create new user
+        new_user = User(username=username, name=name, email=email)
         new_user.set_password(password)
 
         db.session.add(new_user)
@@ -153,6 +162,7 @@ def register():
 
         return redirect('/login')
 
+    print("Form errors:", form.errors)  # Debugging line
     return render_template('register.html', form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -161,10 +171,12 @@ def login():
     if form.validate_on_submit():
         email = form.email.data
         password = form.password.data
-        user = User.query.filter_by(email=email).first()
 
+        user = User.query.filter_by(email=email).first()
         if user and user.check_password(password):
             session['user_id'] = user.id
+            session['username'] = user.username  # ✅ Store username in session
+            print("Session after login:", dict(session))  # Debugging
             return redirect('/')
 
         return "Invalid email or password!"
@@ -174,10 +186,12 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('user_id', None)
+    session.pop('username', None)  # ✅ Remove username from session
     return redirect('/login')
 
 @app.route('/')
 def index():
+    print("Session in home route:", dict(session))  # Debugging
     return render_template('index.html')
 
 @app.route('/my_plans')
@@ -188,34 +202,9 @@ def my_plans():
     user_plans = Plan.query.filter_by(user_id=session['user_id']).order_by(Plan.timestamp.desc()).all()
 
     for plan in user_plans:
-    
         plan.workout_data = json.loads(plan.workout_data)
 
     return render_template('my_plans.html', plans=user_plans)
-
-@app.route('/clear_plans', methods=['POST'])
-def clear_plans():
-    if 'user_id' not in session:
-        return redirect('/login')
-
-    user_id = session['user_id']
-
-    Plan.query.filter_by(user_id=user_id).delete()
-    db.session.commit()
-
-    return redirect('/my_plans')
-
-
-
-@app.route('/get_plan_days/<int:plan_id>')
-def get_plan_days(plan_id):
-    days = Day.query.filter_by(plan_id=plan_id).all()
-    return jsonify({"days": [{"id": day.id, "day_name": day.day_name} for day in days]})
-
-@app.route('/get_plan_exercises/<int:day_id>')
-def get_plan_exercises(day_id):
-    exercises = Exercise.query.filter_by(day_id=day_id).all()
-    return jsonify([{"id": exercise.id, "name": exercise.name} for exercise in exercises])
 
 @app.route('/save_workout', methods=['POST'])
 def save_workout():
@@ -231,8 +220,7 @@ def save_workout():
         return "Plan not found", 404
 
     workout_data = {day_name: {"exercises": {}}} 
-    
- 
+
     exercises = json.loads(plan.workout_data).get(day_name, {}).get("exercises", [])
     for exercise in exercises:
         reps = request.form.get(f"{exercise}_reps")
@@ -243,13 +231,10 @@ def save_workout():
                 "weight": float(weight)
             }
 
- 
     cardio_time = request.form.get("cardio_time")
     if cardio_time and cardio_time.isdigit():  
         workout_data[day_name]["cardio"] = {"time": int(cardio_time)}
 
-
-  
     new_workout = PastWorkout(
         user_id=user_id,
         plan_id=plan_id,
@@ -261,6 +246,17 @@ def save_workout():
 
     return redirect('/past_workouts')
 
+@app.route('/clear_plans', methods=['POST'])
+def clear_plans():
+    if 'user_id' not in session:
+        return redirect('/login')
+
+    user_id = session['user_id']
+
+    Plan.query.filter_by(user_id=user_id).delete()
+    db.session.commit()
+
+    return redirect('/my_plans')
 
 @app.route('/past_workouts')
 def past_workouts():
@@ -277,7 +273,6 @@ def past_workouts():
             print(f"Error decoding workout_data for workout {workout.id}")
 
     return render_template('past_workouts.html', past_workouts=past_workouts)
-
 
 
 @app.route('/clear_past_workouts', methods=['POST'])

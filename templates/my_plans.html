@@ -1,177 +1,72 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Plans</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(to bottom right, #f4f4f9, #d6e4f0);
-            color: #333;
-            margin: 0;
-            padding: 0;
-        }
-        nav {
-            background-color: #222;
-            color: white;
-            padding: 15px 0;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-        nav a {
-            color: white;
-            text-decoration: none;
-            margin: 0 15px;
-            font-size: 18px;
-            padding: 8px 15px;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-        nav a:hover {
-            background-color: #4CAF50;
-        }
-        .container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .plan {
-            background: #f9f9f9;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 8px;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .plan:hover {
-            background-color: #e6f7e6;
-        }
-        .day-list {
-            display: none;
-            padding: 10px;
-            margin-top: 10px;
-        }
-        .day {
-            margin: 10px 0;
-            cursor: pointer;
-            background: #e9ecef;
-            padding: 8px;
-            border-radius: 5px;
-        }
-        .day:hover {
-            background-color: #dbe9db;
-        }
-        .exercise-form {
-            display: none;
-            padding: 10px;
-            border-top: 1px solid #ccc;
-        }
-        input[type="number"], input[type="text"] {
-            width: 60px;
-            margin: 5px;
-        }
-        .save-button {
-            margin-top: 10px;
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .cardio {
-            font-style: italic;
-            color: #d9534f;
-            margin-top: 5px;
-        }
-    </style>
-</head>
-<body>
-    <nav>
-        <a href="/">Home</a>
-        <a href="/about">About Me</a>
-        <a href="/algorithm">Design Your Workout</a>
-        <a href="/my_plans">My Plans</a>
-        <a href="/past_workouts">Past Workouts</a>
-        {% if 'user_id' in session %}
-        <a href="/logout">Logout</a>
-        {% else %}
-        <a href="/login">Login</a>
-        <a href="/register">Register</a>
-        {% endif %}
-    </nav>
+{% extends "base.html" %}
 
-    <div class="container">
-        {% for plan in plans %}
-        <div class="plan" onclick="toggleDays('{{ plan.id }}')">
-            <h3>Plan: {{ plan.id }}</h3>
-            <p><strong>Goal:</strong> {{ plan.goals.replace('_', ' ') | capitalize }}</p>
-            <p><strong>Experience Level:</strong> {{ plan.experience_level.replace('_', ' ') | capitalize }}</p>
-        </div>
-        
+{% block title %}My Plans{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% for plan in plans %}
+    <div class="plan" onclick="toggleDays('{{ plan.id }}')">
+        <h3>Plan: {{ plan.id }}</h3>
+        <p><strong>Goal:</strong> {{ plan.goals.replace('_', ' ') | capitalize }}</p>
+        <p><strong>Experience Level:</strong> {{ plan.experience_level.replace('_', ' ') | capitalize }}</p>
+    </div>
     
-        <div class="day-list" id="day-list-{{ plan.id }}" style="display: none;">
-            {% for day, data in plan.workout_data.items() %}
-                <div class="day" onclick="toggleExercises('{{ plan.id }}', '{{ day }}')">
-                    <h4>{{ day }}</h4>
-                </div>
-    
-                <div class="exercise-form" id="exercise-form-{{ plan.id }}-{{ day }}" style="display: none;">
-                    <form method="POST" action="/save_workout">
-                        <input type="hidden" name="plan_id" value="{{ plan.id }}">
-                        <input type="hidden" name="day" value="{{ day }}">
-    
-                        {% for exercise in data.exercises %}
-                            <div>
-                                <label>{{ exercise }} Reps:</label>
-                                <input type="number" name="{{ exercise }}_reps" required>
-                                <label>Weight (kg):</label>
-                                <input type="number" name="{{ exercise }}_weight" step="0.1" required>
-                            </div>
-                        {% endfor %}
-    
-                        {% if data.cardio %}
-                            <p class="cardio">Cardio: {{ data.cardio }}</p>
-                            <label>Time (minutes):</label>
-                            <input type="number" name="cardio_time" required>
-                        {% endif %}
-    
-                        <button type="submit" class="save-button">Save Workout</button>
-                    </form>
-                </div>
-            {% endfor %}
-        </div>
+
+    <div class="day-list" id="day-list-{{ plan.id }}" style="display: none;">
+        {% for day, data in plan.workout_data.items() %}
+            <div class="day" onclick="toggleExercises('{{ plan.id }}', '{{ day }}')">
+                <h4>{{ day }}</h4>
+            </div>
+
+            <div class="exercise-form" id="exercise-form-{{ plan.id }}-{{ day }}" style="display: none;">
+                <form method="POST" action="/save_workout">
+                    <input type="hidden" name="plan_id" value="{{ plan.id }}">
+                    <input type="hidden" name="day" value="{{ day }}">
+
+                    {% for exercise in data.exercises %}
+                        <div>
+                            <label>{{ exercise }} Reps:</label>
+                            <input type="number" name="{{ exercise }}_reps" required>
+                            <label>Weight (kg):</label>
+                            <input type="number" name="{{ exercise }}_weight" step="0.1" required>
+                        </div>
+                    {% endfor %}
+
+                    {% if data.cardio %}
+                        <p class="cardio">Cardio: {{ data.cardio }}</p>
+                        <label>Time (minutes):</label>
+                        <input type="number" name="cardio_time" required>
+                    {% endif %}
+
+                    <button type="submit" class="save-button">Save Workout</button>
+                </form>
+            </div>
+        {% endfor %}
+    </div>
     {% else %}
         <p>No workout plans available.</p>
     {% endfor %}
-    </div>
+</div>
 
-    <form action="/clear_plans" method="POST" style="text-align: center; margin-top: 20px;">
-        <button type="submit" style="padding: 10px 20px; background-color: red; color: white; border: none; border-radius: 5px;">
-            Clear All My Plans
-        </button>
-    </form>
-    
-    <script>
-        function toggleDays(planId) {
-            let dayList = document.getElementById("day-list-" + planId);
-            if (dayList) {
-                dayList.style.display = (dayList.style.display === "none" || dayList.style.display === "") ? "block" : "none";
-            }
-        }
+<form action="/clear_plans" method="POST" style="text-align: center; margin-top: 20px;">
+    <button type="submit" style="padding: 10px 20px; background-color: red; color: white; border: none; border-radius: 5px;">
+        Clear All My Plans
+    </button>
+</form>
 
-        function toggleExercises(planId, dayName) {
-            let exerciseForm = document.getElementById(`exercise-form-${planId}-${dayName}`);
-            if (exerciseForm) {
-                exerciseForm.style.display = (exerciseForm.style.display === "none" || exerciseForm.style.display === "") ? "block" : "none";
-            }
+<script>
+    function toggleDays(planId) {
+        let dayList = document.getElementById("day-list-" + planId);
+        if (dayList) {
+            dayList.style.display = (dayList.style.display === "none" || dayList.style.display === "") ? "block" : "none";
         }
-    </script>
-    
-</body>
-</html>
+    }
+
+    function toggleExercises(planId, dayName) {
+        let exerciseForm = document.getElementById(`exercise-form-${planId}-${dayName}`);
+        if (exerciseForm) {
+            exerciseForm.style.display = (exerciseForm.style.display === "none" || exerciseForm.style.display === "") ? "block" : "none";
+        }
+    }
+</script>
+{% endblock %}

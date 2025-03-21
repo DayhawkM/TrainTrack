@@ -1,156 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(to bottom right, #f4f4f9, #d6e4f0);
-            color: #333;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
+{% block title %}Login{% endblock %}
 
-        nav {
-            background-color: #222;
-            color: white;
-            padding: 15px 0;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            margin-left: 20px;
-        }
-
-        nav a {
-            color: white;
-            text-decoration: none;
-            margin: 0 20px;
-            font-size: 18px;
-            padding: 8px 15px;
-            border-radius: 5px;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        nav a:hover {
-            background-color: #4CAF50;
-            color: white;
-        }
-
-        .form-container {
-            background-color: #fff;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
-            margin: 20px auto;
-        }
-
-        h1 {
-            text-align: center;
-            color: #444;
-            font-size: 2rem;
-            margin-bottom: 20px;
-        }
-
-        label {
-            font-size: 14px;
-            color: #555;
-        }
-
-        input[type="email"], input[type="password"] {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 16px;
-            background-color: #f9f9f9;
-            transition: border-color 0.3s ease;
-        }
-
-        input[type="email"]:focus, input[type="password"]:focus {
-            border-color: #4CAF50;
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: #4CAF50;
-            border: none;
-            border-radius: 6px;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: background-color 0.3s ease;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-            color: #777;
-        }
-
-        .footer a {
-            color: #4CAF50;
-            text-decoration: none;
-        }
-
-        .footer a:hover {
-            text-decoration: underline;
-        }
-    </style>
-</head>
-
-<body>
-    <nav>
-        <a href="/">Home</a>
-        <a href="/about">About Me</a>
-        <a href="/algorithm">Design Your Workout</a>
-        <a href="/my_plans">My Plans</a>
-        <a href="/past_workouts">Past Workouts</a>
-        {% if 'user_id' in session %}
-        <a href="/logout">Logout</a>
-        {% else %}
-        <a href="/login">Login</a>
-        <a href="/register">Register</a>
-        {% endif %}
-    </nav>
-
-    <div class="form-container">
-        <h1>Login</h1>
-        <form method="POST" action="{{ url_for('login') }}">
-            {{ form.hidden_tag() }}
-            <div>
-                <label for="email">{{ form.email.label }}</label>
-                {{ form.email(class="form-control") }}
-            </div>
-            <div>
-                <label for="password">{{ form.password.label }}</label>
-                {{ form.password(class="form-control") }}
-            </div>
-            <div>
-                {{ form.submit(class="btn") }}
-            </div>
-        </form>
-        <div class="footer">
-            <p>Don't have an account? <a href="/register">Register</a></p>
+{% block content %}
+<div class="form-container">
+    <h1>Login</h1>
+    <form method="POST" action="{{ url_for('login') }}">
+        {{ form.hidden_tag() }}
+        <div>
+            <label for="email">{{ form.email.label }}</label>
+            {{ form.email(class="form-control") }}
         </div>
+        <div>
+            <label for="password">{{ form.password.label }}</label>
+            {{ form.password(class="form-control") }}
+        </div>
+        <div>
+            {{ form.submit(class="btn") }}
+        </div>
+    </form>
+    <div class="footer">
+        <p>Don't have an account? <a href="/register">Register</a></p>
     </div>
-</body>
-
-</html>
+</div>
+{% endblock %}
