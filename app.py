@@ -15,8 +15,14 @@ app.secret_key = 'your_secret_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///traintrack.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+csp = {
+    'default-src': ["'self'"],
+    'style-src': ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+    'font-src': ["'self'", "https://fonts.gstatic.com"],
+    'img-src': ["'self'", "data:"]
+}
 
-Talisman(app)
+Talisman(app, content_security_policy=csp)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
