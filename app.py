@@ -7,7 +7,7 @@ import json
 from datetime import datetime
 from flask_talisman import Talisman
 
-#pip install flask flask-sqlalchemy flask-migrate flask-wtf wtforms werkzeug email_validator flask_talisman
+#pip install flask flask-sqlalchemy flask-migrate flask-wtf wtforms werkzeug email_validator flask_talisman gunicorng
 #install extension "SQLite Viewer" for better database readability
 
 app = Flask(__name__)
@@ -16,7 +16,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///traintrack.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 
-Talisman(app, force_https=False, content_security_policy=None)
+Talisman(app)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
